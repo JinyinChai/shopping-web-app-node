@@ -2,11 +2,12 @@ const {verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToke
 const CryptoJS = require("crypto-js");
 const router = require("express").Router();
 const Product = require("../models/Product");
+const Order = require("../models/Order");
 
 //create
-router.post("/newProduct", verifyTokenAndAdminAndSeller, async (req, res) => {
-    const newProduct = new Product({seller: req.user.id, ...req.body});
-
+router.post("/newProduct", async (req, res) => {
+    // const newProduct = new Product({seller: req.user.id, ...req.body});
+    const newProduct = new Product(req.body);
     try {
         const savedProduct = await newProduct.save();
         return res.status(200).json(savedProduct);
@@ -16,7 +17,7 @@ router.post("/newProduct", verifyTokenAndAdminAndSeller, async (req, res) => {
 });
 
 //update
-router.put("/:uid/:id", verifyTokenAndAdminAndTheSeller, async (req, res) => {
+router.put("/update/:id", async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
             $set: req.body
@@ -29,7 +30,7 @@ router.put("/:uid/:id", verifyTokenAndAdminAndTheSeller, async (req, res) => {
 
 
 //delete
-router.delete("/:uid/:id", verifyTokenAndAdminAndTheSeller, async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
     try{
         await Product.findByIdAndDelete(req.params.id);
         return res.status(200).json("Product has been deleted.");
@@ -38,6 +39,25 @@ router.delete("/:uid/:id", verifyTokenAndAdminAndTheSeller, async (req, res) => 
     }
 })
 
+//get products by seller
+router.get("/findByUser/:userId", async (req, res) => {
+    try{
+        const products = await Product.find({seller: req.params.userId});
+        return res.status(200).json(products);
+    } catch (err){
+        return res.status(500).json(err);
+    }
+})
+
+//get products by title
+router.get("/findByTitle/:title", async (req, res) => {
+    try{
+        const products = await Product.find({title: {$regex: ".*" + req.params.title + ".*"}});
+        return res.status(200).json(products);
+    } catch (err){
+        return res.status(500).json(err);
+    }
+})
 
 
 //get product
