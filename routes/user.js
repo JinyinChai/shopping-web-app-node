@@ -32,8 +32,11 @@ router.delete("/delete/:id", async (req, res) => {
 router.get("/find/:id", async (req, res) => {
     try{
         const user = await User.findById(req.params.id);
-        const { password, ...others} = user._doc;
-        return res.status(200).json(others);
+        // const hashedPassword = CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC);
+        // const Originalpassword = hashedPassword.toString(CryptoJS.enc.Utf8);
+        // const { password, ...others} = user._doc;
+        // user.password = Originalpassword;
+        return res.status(200).json(user);
     } catch (err){
         return res.status(500).json(err);
     }
