@@ -38,6 +38,16 @@ router.delete("/delete/:id", async (req, res) => {
     }
 })
 
+//get order by id
+router.get("/get/:id", async (req, res) => {
+    try{
+        const orders = await Order.findById(req.params.id);
+        return res.status(200).json(orders);
+    } catch (err){
+        return res.status(500).json(err);
+    }
+})
+
 //get user Order
 router.get("/find/:userId", async (req, res) => {
     try{
